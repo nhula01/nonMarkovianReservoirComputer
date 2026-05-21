@@ -38,3 +38,6 @@ SP500_Features_2014_2024_rep10_tau20.py:
 - SP500_Features_2014_2024_rep10_tau20.csv
 SP500_Features_2014_2024_rep10_tau25.py:
 - SP500_Features_2014_2024_rep10_tau25.csv
+
+
+I run the following with 1 rep as well

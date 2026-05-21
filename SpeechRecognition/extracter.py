@@ -1,6 +1,7 @@
 import numpy as np
 from sklearn.model_selection import KFold
 from joblib import load 
+import pandas as pd
 
 def get_ytrain_test_from_fold(path, n_features=36, num_classes=10):
     """
@@ -42,6 +43,38 @@ def extract_pq(x):
 
 import ast
 
+def extract_delayed_single_column(df, column_name, N=10, repeat_steps=5):
+    """
+    Extract delayed P,Q features from a single column when the same input
+    is repeated every `repeat_steps` simulation steps.
+    Returns one feature row per repeated input block.
+    For repeat_steps = 5, it returns rows:
+        X[4], X[9], X[14], ...
+    """
+    if N % 2 != 0:
+        raise ValueError("N must be even because each delayed time gives two values: P and Q.")
+    T = len(df)
+    num_delays = N // 2 
+    pq_values = np.zeros((T, 2), dtype=float) # store all p and q values at every step
+    for t in range(T): # extract p and q for each step
+        P, Q = extract_pq(df[column_name].iloc[t])
+        pq_values[t, 0] = P
+        pq_values[t, 1] = Q 
+    X = np.zeros((T, N), dtype=float) # create a feature matrix
+    for t in range(T):
+        delayed_pairs = []
+        for d in range(num_delays):
+            idx = t - d * repeat_steps
+            if idx >= 0:
+                delayed_pairs.append(pq_values[idx])
+        delayed_pairs = delayed_pairs[::-1]
+        flattened = np.array(delayed_pairs).reshape(-1)
+        X[t, -len(flattened):] = flattened
+    # Keep only one row per repeated-input block
+    n_blocks = T // repeat_steps
+    X_block = X[repeat_steps - 1 : n_blocks * repeat_steps : repeat_steps]
+    return X_block
+
 def extract_block_single_column_skip(df,column_name="P0",N_fts=36,n_samples=500,skip_steps=1):
     """
     Extract N_fts values from one column for each sample.
@@ -70,7 +103,7 @@ def extract_block_single_column_skip(df,column_name="P0",N_fts=36,n_samples=500,
     idx = 0 
     for _ in range(int(n_samples)):
         for i in range(N_fts):
-            idx = _*N_fts*skip_steps + i*skip_steps+ (skip_steps - 1)
+            idx = _*N_fts*skip_steps + i*skip_steps + (skip_steps - 1)
             value = df.iloc[idx]
             parsed = ast.literal_eval(str(value))
             X[_, i] = np.asarray(parsed[0]).squeeze().real
@@ -139,3 +172,57 @@ def add_polynomial_features(X, nodes=10):
             state1.append(state1[12] * statedf1[-1])
         X_poly.append(state1)
     return np.array(X_poly, dtype=float)
+
+def speech_5folds_extracter(column_name, gamma = '10',rep = 3, fold_nums = [0,1,2,3,4], num_ft=36):
+    fold_nums = fold_nums
+    num_ft = num_ft
+    digits = [int(i) for i in range(10)]
+    rep = rep
+    all_targets = {}
+    all_states = {}
+    real_targets = {}
+    gamma=gamma
+    
+    for fold_num in fold_nums:
+        ### creating the target 
+        y_train = load(f'5_fold_{fold_num}_5speakers_{num_ft}fts.joblib')['y_train'] # unload y_train
+        target_train = [int(i) for i in y_train][::num_ft] # store y_train while skipping the repetition
+        y_test = load(f'5_fold_{fold_num}_5speakers_{num_ft}fts.joblib')['y_test'] # unload y_test
+        target_test = [int(i) for i in y_test][::num_ft] # store y_test while skipping the repetition
+        target_train.extend(target_test) # combine y_train,y_test as one
+        name = str(fold_num) + '_' + str(num_ft) # each name indicates which fold and the amount of features
+        real_targets[name] = target_train # store all targets into real_target dictionary
+    
+        ### Converting the digits into 10 classifiers and store them in all_targets
+        for digit in digits:
+            name = str(fold_num) + '_digit_' + str(digit) +'_'+ str(num_ft)
+            all_targets[name] = []  
+        w0 = 0
+        w1 = 1
+        for i in target_train:
+            for j in digits:
+                if int(j)==int(i):
+                    name = str(fold_num) + '_digit_' + str(j) +'_'+ str(num_ft)
+                    all_targets[name].append(w1)
+                else:
+                    name = str(fold_num) + '_digit_' + str(j) +'_'+ str(num_ft)
+                    all_targets[name].append(w0)
+        
+     
+        ### read Quantum features
+        # read features from mean
+        data = pd.read_csv(f"{num_ft}ASR_mean_{rep}rep_gamma{gamma}_fold{fold_num}.csv")
+        name = str(fold_num)+'state_mean'+str(num_ft)
+        skip_steps = rep
+        X_mean= extract_block_single_column_pq(data ,column_name=column_name,N_fts=num_ft,n_samples=500,skip_steps=skip_steps)
+        all_states[name] = X_mean
+         
+        # read features from std
+        data = pd.read_csv(f"{num_ft}ASR_std_{rep}rep_gamma{gamma}_fold{fold_num}.csv")
+        name = str(fold_num)+'state_std'+str(num_ft)
+        skip_steps = rep
+        X_std= extract_block_single_column_pq(data ,column_name=column_name, N_fts=num_ft,n_samples=500,skip_steps=skip_steps)
+        all_states[name] = X_std
+
+
+    return all_targets, all_states, real_targets
