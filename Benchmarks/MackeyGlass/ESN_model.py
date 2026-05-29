@@ -52,8 +52,5 @@ def make_esn_weights(N: int,input_scale: float = 1.0,spectral_radius: float = 1.
         A *= spectral_radius / rho
     # Input weights
     B = input_scale * (2.0 * np.random.rand(N) - 1.0)
-    print("A norm", np.linalg.norm(A))
-    print("B norm", np.linalg.norm(B))
-    print("A/B ratio", np.linalg.norm(A) / np.linalg.norm(B))
 
     return A, B

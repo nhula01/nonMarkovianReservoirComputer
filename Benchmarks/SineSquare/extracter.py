@@ -162,12 +162,12 @@ def add_polynomial_features(X, nodes=10):
             state1.append(state1[1] * statedf1[i])
         # 2nd polynomial block
         for i in range(nodes):
-            state1.append(state1[10] * statedf1[i])
+            state1.append(state1[nodes] * statedf1[i])
         # 3rd polynomial block
         for i in range(nodes):
-            state1.append(state1[11] * statedf1[-1])
+            state1.append(state1[nodes+1] * statedf1[-1])
         # 4th polynomial block
         for i in range(nodes):
-            state1.append(state1[12] * statedf1[-1])
+            state1.append(state1[nodes+2] * statedf1[-1])
         X_poly.append(state1)
     return np.array(X_poly, dtype=float)

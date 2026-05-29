@@ -19,7 +19,6 @@ MeasurementsBond5_gammatau1.csv: chi_max = 5, tau=10, phi=0
 MeasurementsBond10_gammatau1.csv: chi_max = 10, tau=10, phi=0
 MeasurementsBond15_gammatau1.csv: chi_max = 5, tau=10, phi=0
 
-
 # random drive
 MeasurementsBond5_gammatau1_5_random.csv: chi_max = 5, tau=15, phi=0 random.seed = 43
 MeasurementsBond10_gammatau1_5_random.csv: chi_max = 10, tau=15, phi=0 random.seed = 43
