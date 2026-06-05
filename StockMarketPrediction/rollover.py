@@ -3,6 +3,7 @@ from sklearn.preprocessing import MinMaxScaler
 from fitting_model import *
 from ESN_model import *
 from extracter import *
+import numpy as np
 
 def rollover(start, end, name, X_features, tau=1, Nfading=10):
     prices = yf.download(name,start=f"{start}-01-01",end=f"{end}-01-01")["Close"]
@@ -30,17 +31,14 @@ def rollover(start, end, name, X_features, tau=1, Nfading=10):
         X = X_features[index : index + K, :]
         X_train = X[Nfading : Nfading + Ntraining, :]
         X_test = X[Nfading + Ntraining : Nfading + Ntraining + Ntesting, :]
-
         y_target = scaled_data[index + tau : index + K + tau]
         y_train = y_target[Nfading : Nfading + Ntraining]
         y_test = y_target[Nfading + Ntraining : Nfading + Ntraining + Ntesting]
-
         W = fitting_function(X_train, y_train)
         y_prediction = predict(X_test, W)
 
         error = nrmse(y_prediction, y_test)
         errors.append(error)
-
         results.append({
             "round": test_round,
             "train_start": train_start,
@@ -52,12 +50,9 @@ def rollover(start, end, name, X_features, tau=1, Nfading=10):
             "Ntesting": Ntesting,
             "NRMSE": error,
         })
-
     errors = np.array(errors)
-
     mean_error = np.mean(errors)
-    std_error = np.std(errors, ddof=1)   # sample std
-
+    std_error = np.std(errors, ddof=1)  
     print("Final result:")
     print("NRMSE values:", errors)
     print(f"Mean NRMSE: {mean_error}")
@@ -65,61 +60,26 @@ def rollover(start, end, name, X_features, tau=1, Nfading=10):
     return results, errors
 
 
-def rollover_esn(
-    start,
-    end,
-    name,
-    N=50,
-    tau=1,
-    Nfading=100,
-    input_scale=1.0,
-    spectral_radius=0.95,
-    connectivity=0.1,
-):
+def rollover_esn(start,end,name,N=50,tau=1,Nfading=100,input_scale=1.0,spectral_radius=0.95,connectivity=0.1):
     # Download full dataset first
-    prices = yf.download(
-        name,
-        start=f"{start}-01-01",
-        end=f"{end}-01-01"
-    )["Close"]
-
+    prices = yf.download(name,start=f"{start}-01-01",end=f"{end}-01-01")["Close"]
     dataset = prices.values.reshape(-1, 1)
-
     scaler = MinMaxScaler(feature_range=(0, 1))
     scaled_data = scaler.fit_transform(dataset).flatten()
-
     # Build ESN weights
-    A, B = make_esn_weights(
-        N,
-        input_scale=input_scale,
-        spectral_radius=spectral_radius,
-        connectivity=connectivity,
-    )
-
+    A, B = make_esn_weights(N,input_scale=input_scale,spectral_radius=spectral_radius,connectivity=connectivity)
     # Generate ESN reservoir states for full time series
     X_features = esn_dynamics(scaled_data, A, B)
-
     M_test = end - start - 2
-
     results = []
     errors = []
-
     for test_round in range(M_test):
         train_start = start + test_round
         train_end = train_start + 2
         test_end = train_start + 3
 
-        stock_3yr = yf.download(
-            name,
-            start=f"{train_start}-01-01",
-            end=f"{test_end}-01-01"
-        )["Close"]
-
-        stock_2yr = yf.download(
-            name,
-            start=f"{train_start}-01-01",
-            end=f"{train_end}-01-01"
-        )["Close"]
+        stock_3yr = yf.download(name,start=f"{train_start}-01-01",end=f"{test_end}-01-01")["Close"]
+        stock_2yr = yf.download(name,start=f"{train_start}-01-01",end=f"{train_end}-01-01")["Close"]
 
         Ntotal = len(stock_3yr)
         Ntraining = len(stock_2yr) - Nfading
@@ -132,23 +92,19 @@ def rollover_esn(
 
         # ESN features
         X = X_features[index : index + K, :]
-
         X_train = X[Nfading : Nfading + Ntraining, :]
         X_test = X[Nfading + Ntraining : Nfading + Ntraining + Ntesting, :]
 
         # Target is shifted by tau
         y_target = scaled_data[index + tau : index + K + tau]
-
         y_train = y_target[Nfading : Nfading + Ntraining]
         y_test = y_target[Nfading + Ntraining : Nfading + Ntraining + Ntesting]
 
         # Fit readout
         W = fitting_function(X_train, y_train)
         y_prediction = predict(X_test, W)
-
         error = nrmse(y_prediction, y_test)
         errors.append(error)
-
         results.append({
             "round": test_round,
             "train_start": train_start,
@@ -162,10 +118,8 @@ def rollover_esn(
         })
 
     errors = np.array(errors)
-
     mean_error = np.mean(errors)
     std_error = np.std(errors, ddof=1)
-
     print("Final result")
     print("NRMSE values:", errors)
     print(f"Mean NRMSE: {mean_error}")
@@ -173,48 +127,19 @@ def rollover_esn(
 
     return results, errors
 
-import numpy as np
-import matplotlib.pyplot as plt
-
-def run_esn_repeated(
-    tasks,
-    tasks_name,
-    start=2014,
-    end=2024,
-    n_runs=100,
-    N=30,
-    tau=1,
-    Nfading=10,
-    input_scale=1.0,
-    spectral_radius=0.95,
-    connectivity=0.1,
-):
+def run_esn_repeated(tasks,tasks_name,start=2014,end=2024,n_runs=100,N=30,tau=1,Nfading=10,input_scale=1.0,spectral_radius=0.95,connectivity=0.1):
     esn_performance = {}
-
     for task, task_label in zip(tasks, tasks_name):
         all_errors = []
-
         print(f"\nRunning ESN for {task_label}")
-
         for run in range(n_runs):
             print(f"Run {run + 1}/{n_runs}")
-
-            results, errors = rollover_esn(
-                start=start,
-                end=end,
-                name=task,
-                N=N,
-                tau=tau,
-                Nfading=Nfading,
-                input_scale=input_scale,
-                spectral_radius=spectral_radius,
-                connectivity=connectivity,
-            )
+            results, errors = rollover_esn(start=start,end=end,name=task,N=N,tau=tau,Nfading=Nfading,input_scale=input_scale,
+                spectral_radius=spectral_radius,connectivity=connectivity)
 
             all_errors.append(errors)
 
         all_errors = np.array(all_errors)
-        # shape = (n_runs, n_folds)
 
         # Average each fold over 100 ESN random initializations
         mean_per_fold = np.mean(all_errors, axis=0)

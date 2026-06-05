@@ -135,13 +135,6 @@ def extract_p_row(df, column_names, repeat_steps=5, keep_last=True):
 def add_polynomial_features(X, nodes=10):
     """
     Add polynomial/product features to X.
-    Starting from each row:
-        x0, x1, ..., x9
-    We append:
-        x1 * x_i        for i = 0,...,nodes-1
-        poly_0 * x_i    for i = 0,...,nodes-1
-        poly_1 * x_last for i = 0,...,nodes-1
-        poly_2 * x_last for i = 0,...,nodes-1
     """
     X_poly = []
     for row in X:
@@ -150,16 +143,16 @@ def add_polynomial_features(X, nodes=10):
         statedf1 = list(row)
         # 1st polynomial block
         for i in range(nodes):
-            state1.append(state1[1] * statedf1[i])
+            state1.append(state1[0] * statedf1[i])
         # 2nd polynomial block
         for i in range(nodes):
-            state1.append(state1[10] * statedf1[i])
+            state1.append(state1[10+i] * statedf1[i])
         # 3rd polynomial block
         for i in range(nodes):
-            state1.append(state1[11] * statedf1[-1])
+            state1.append(state1[20+i] * statedf1[i])
         # 4th polynomial block
         for i in range(nodes):
-            state1.append(state1[12] * statedf1[-1])
+            state1.append(state1[30+i] * statedf1[i])
         X_poly.append(state1)
     return np.array(X_poly, dtype=float)
 

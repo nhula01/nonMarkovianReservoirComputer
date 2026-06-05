@@ -21,8 +21,6 @@ def get_Xtrain_test_from_fold(path):
     """
     Load fold data and return:
     X_mean_train, X_mean_test, X_std_train, X_std_test, 
-    If y_train/y_test are repeated once per feature, this keeps only
-    one label per sample using [::n_features].
     """
     fold_data = load(path)
     X_mean_train = fold_data["X_mean_train"]
@@ -144,13 +142,6 @@ def extract_block_single_column_pq(df,column_name,N_fts=36,n_samples=500, skip_s
 def add_polynomial_features(X, nodes=10):
     """
     Add polynomial/product features to X.
-    Starting from each row:
-        x0, x1, ..., x9
-    We append:
-        x1 * x_i        for i = 0,...,nodes-1
-        poly_0 * x_i    for i = 0,...,nodes-1
-        poly_1 * x_last for i = 0,...,nodes-1
-        poly_2 * x_last for i = 0,...,nodes-1
     """
     X_poly = []
     for row in X:
@@ -159,15 +150,15 @@ def add_polynomial_features(X, nodes=10):
         statedf1 = list(row)
         # 1st polynomial block
         for i in range(nodes):
-            state1.append(state1[1] * statedf1[i])
+            state1.append(state1[0] * statedf1[i])
         # 2nd polynomial block
         for i in range(nodes):
             state1.append(state1[nodes] * statedf1[i])
         # 3rd polynomial block
         for i in range(nodes):
-            state1.append(state1[nodes+1] * statedf1[-1])
+            state1.append(state1[nodes*2] * statedf1[i])
         # 4th polynomial block
         for i in range(nodes):
-            state1.append(state1[nodes+2] * statedf1[-1])
+            state1.append(state1[nodes*3] * statedf1[i])
         X_poly.append(state1)
     return np.array(X_poly, dtype=float)

@@ -14,13 +14,13 @@ chi_max = 5
 
 original: noperturbation -> Reservoir 1
 
-allpertubed001. add .001 to the perturbation
-allpertubed002. add .002 to the perturbation
-allpertubed003. add .003 to the perturbation
+allpertubed001. add .001 to all input
+allpertubed002. add .002 to all input
+allpertubed003. add .003 to all input
 
-perturbedat100_001 add .001 to the perturbation at 100
-perturbedat100_002 add .002 to the perturbation at 100
-perturbedat100_003 add .003 to the perturbation at 100
+perturbedat100_001 add .001 to the input at 100
+perturbedat100_002 add .002 to the input at 100
+perturbedat100_003 add .003 to the input at 100
 
 omega = .1 # input strength -> Reservoir 2
 

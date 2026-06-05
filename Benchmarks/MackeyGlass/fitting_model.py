@@ -8,9 +8,6 @@ import numpy as np
 def fitting_function(X: np.ndarray, y: np.ndarray, delta: float = 1e-10) -> np.ndarray:
     """
     Ridge regression with bias column.
-    X: shape (L, nnodes)
-    y: shape (L,)
-    returns W: shape (nnodes + 1,)
     """
     L, nnodes = X.shape
     # Add bias column

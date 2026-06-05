@@ -22,8 +22,6 @@ def get_Xtrain_test_from_fold(path):
     """
     Load fold data and return:
     X_mean_train, X_mean_test, X_std_train, X_std_test, 
-    If y_train/y_test are repeated once per feature, this keeps only
-    one label per sample using [::n_features].
     """
     fold_data = load(path)
     X_mean_train = fold_data["X_mean_train"]
@@ -34,8 +32,7 @@ def get_Xtrain_test_from_fold(path):
     return X_mean_train, X_mean_test, X_std_train, X_std_test
     
 def extract_pq(x):
-    # Convert string like "(array([0.1]), array([0.2]))"
-    # into two floats: P, Q
+    # Convert string like "(array([0.1]), array([0.2]))" into two floats: P, Q
     s = str(x)
     s = s.replace("array", "np.array")
     P, Q = eval(s, {"np": np})
@@ -142,36 +139,6 @@ def extract_block_single_column_pq(df,column_name,N_fts=36,n_samples=500, skip_s
                 X[sample, 2*i + 1] = Q
     return X
 
-def add_polynomial_features(X, nodes=10):
-    """
-    Add polynomial/product features to X.
-    Starting from each row:
-        x0, x1, ..., x9
-    We append:
-        x1 * x_i        for i = 0,...,nodes-1
-        poly_0 * x_i    for i = 0,...,nodes-1
-        poly_1 * x_last for i = 0,...,nodes-1
-        poly_2 * x_last for i = 0,...,nodes-1
-    """
-    X_poly = []
-    for row in X:
-        state1 = list(row)
-        # original input features
-        statedf1 = list(row)
-        # 1st polynomial block
-        for i in range(nodes):
-            state1.append(state1[1] * statedf1[i])
-        # 2nd polynomial block
-        for i in range(nodes):
-            state1.append(state1[10] * statedf1[i])
-        # 3rd polynomial block
-        for i in range(nodes):
-            state1.append(state1[11] * statedf1[-1])
-        # 4th polynomial block
-        for i in range(nodes):
-            state1.append(state1[12] * statedf1[-1])
-        X_poly.append(state1)
-    return np.array(X_poly, dtype=float)
 
 def speech_5folds_extracter(column_name, gamma = '10',rep = 3, fold_nums = [0,1,2,3,4], num_ft=36):
     fold_nums = fold_nums

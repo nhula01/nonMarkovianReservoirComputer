@@ -11,7 +11,7 @@ def train(all_targets, all_states, real_targets, train_points = 395, delay_point
     digits = [int(i) for i in range(10)]
 
     for fold_num in fold_nums: 
-        ### Combine STD and Mean of each fTogether for computation
+        ### Combine STD and Mean of each fold together for computation
         name_state = str(fold_num)+'state_mean'+str(num_ft)
         states_mean = all_states[name_state]
         name_state = str(fold_num)+'state_std'+str(num_ft)

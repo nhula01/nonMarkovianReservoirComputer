@@ -1,8 +1,7 @@
 import numpy as np
 
 def extract_pq(x):
-    # Convert string like "(array([0.1]), array([0.2]))"
-    # into two floats: P, Q
+    # Convert string like "(array([0.1]), array([0.2]))" into two floats: P, Q
     s = str(x)
     s = s.replace("array", "np.array")
     P, Q = eval(s, {"np": np})
@@ -69,49 +68,32 @@ def extract_delayed_p_or_q_single_column(df, column_name, N=10, repeat_steps=5):
 def extract_pq_row(df, column_names=None, repeat_steps=5, keep_last=True):
     """
     Extract both P and Q from columns PQ-15, PQ-14, ..., PQ0 in each selected row.
-
-    Each cell is assumed to contain something readable by extract_pq(),
-    for example:
-        "(array([P]), array([Q]))"
-
     Output feature order:
         [P(PQ-15), Q(PQ-15), P(PQ-14), Q(PQ-14), ..., P(PQ0), Q(PQ0)]
-
     Output shape:
         (number_of_selected_rows, 2 * number_of_columns)
     """
-
     if column_names is None:
         column_names = [f"PQ-{i}" for i in range(15, 0, -1)] + ["PQ0"]
-
     T = len(df)
-
     if keep_last:
         selected_indices = np.arange(repeat_steps - 1, T, repeat_steps)
     else:
         selected_indices = np.arange(0, T, repeat_steps)
-
     X = np.zeros((len(selected_indices), 2 * len(column_names)), dtype=float)
-
     for i, row_idx in enumerate(selected_indices):
         features = []
-
         for col in column_names:
             P, Q = extract_pq(df[col].iloc[row_idx])
             features.extend([P, Q])
-
         X[i, :] = features
-
     return X
-
 
 def extract_p_row(df, column_names, repeat_steps=5, keep_last=True):
     """
     Extract P-only features from multiple columns in the same row.
     Instead of taking delayed values from one column over time,
     this takes P values from several columns in each selected row.
-    Example:
-        column_names = ["P-9", "P-8", ..., "P0"]
     If repeat_steps = 5 and keep_last=True, it keeps rows:
         4, 9, 14, 19, ...
     Output shape:
@@ -128,33 +110,3 @@ def extract_p_row(df, column_names, repeat_steps=5, keep_last=True):
             X[i, j] = extract_pq(df[col].iloc[row_idx])[0]
     return X
 
-def add_polynomial_features(X, nodes=10):
-    """
-    Add polynomial/product features to X.
-    Starting from each row:
-        x0, x1, ..., x9
-    We append:
-        x1 * x_i        for i = 0,...,nodes-1
-        poly_0 * x_i    for i = 0,...,nodes-1
-        poly_1 * x_last for i = 0,...,nodes-1
-        poly_2 * x_last for i = 0,...,nodes-1
-    """
-    X_poly = []
-    for row in X:
-        state1 = list(row)
-        # original input features
-        statedf1 = list(row)
-        # 1st polynomial block
-        for i in range(nodes):
-            state1.append(state1[1] * statedf1[i])
-        # 2nd polynomial block
-        for i in range(nodes):
-            state1.append(state1[10] * statedf1[i])
-        # 3rd polynomial block
-        for i in range(nodes):
-            state1.append(state1[11] * statedf1[-1])
-        # 4th polynomial block
-        for i in range(nodes):
-            state1.append(state1[12] * statedf1[-1])
-        X_poly.append(state1)
-    return np.array(X_poly, dtype=float)

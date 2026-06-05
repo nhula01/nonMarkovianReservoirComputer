@@ -1,8 +1,7 @@
 import numpy as np
 
 def extract_pq(x):
-    # Convert string like "(array([0.1]), array([0.2]))"
-    # into two floats: P, Q
+    # Convert string like "(array([0.1]), array([0.2]))" into two floats: P, Q
     s = str(x)
     s = s.replace("array", "np.array")
     P, Q = eval(s, {"np": np})
@@ -69,14 +68,8 @@ def extract_delayed_p_or_q_single_column(df, column_name, N=10, repeat_steps=5):
 def extract_pq_row(df, column_names=None, repeat_steps=5, keep_last=True):
     """
     Extract both P and Q from columns PQ-15, PQ-14, ..., PQ0 in each selected row.
-
-    Each cell is assumed to contain something readable by extract_pq(),
-    for example:
-        "(array([P]), array([Q]))"
-
     Output feature order:
         [P(PQ-15), Q(PQ-15), P(PQ-14), Q(PQ-14), ..., P(PQ0), Q(PQ0)]
-
     Output shape:
         (number_of_selected_rows, 2 * number_of_columns)
     """
@@ -131,13 +124,6 @@ def extract_p_row(df, column_names, repeat_steps=5, keep_last=True):
 def add_polynomial_features(X, nodes=10):
     """
     Add polynomial/product features to X.
-    Starting from each row:
-        x0, x1, ..., x9
-    We append:
-        x1 * x_i        for i = 0,...,nodes-1
-        poly_0 * x_i    for i = 0,...,nodes-1
-        poly_1 * x_last for i = 0,...,nodes-1
-        poly_2 * x_last for i = 0,...,nodes-1
     """
     X_poly = []
     for row in X:
@@ -146,15 +132,15 @@ def add_polynomial_features(X, nodes=10):
         statedf1 = list(row)
         # 1st polynomial block
         for i in range(nodes):
-            state1.append(state1[1] * statedf1[i])
+            state1.append(state1[0] * statedf1[i])
         # 2nd polynomial block
         for i in range(nodes):
             state1.append(state1[nodes] * statedf1[i])
         # 3rd polynomial block
         for i in range(nodes):
-            state1.append(state1[nodes+1] * statedf1[-1])
+            state1.append(state1[nodes*2] * statedf1[i])
         # 4th polynomial block
         for i in range(nodes):
-            state1.append(state1[nodes+2] * statedf1[-1])
+            state1.append(state1[nodes*3] * statedf1[i])
         X_poly.append(state1)
     return np.array(X_poly, dtype=float)

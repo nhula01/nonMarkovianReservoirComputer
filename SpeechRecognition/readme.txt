@@ -9,17 +9,7 @@ Phi= np.pi/3
 theta = np.pi/3
 
 
-(last time was run for tau = 10, maxbin 100 and with the P measured. ASR already has its bar due to fold division even though it is not )
-
-ASR_1rep_DiffQuad_mean/std.py gives gamma = .1
-- 36ASR_mean_1_rep_fold#.csv
-- 36ASR_std_1_rep_fold#.csv
-ASR_3rep_DiffQuad_mean/std.py gives gamma = .1
-- 36ASR_mean_3rep_fold#.csv
-- 36ASR_mean_3_rep_fold#.csv
-
-------------------
-I run the system for gamma=.05, gamma=.15, gamma = .2, gamma =.25
+I run the system for gamma=.05, gamma=.1, gamma=.15, gamma = .2, gamma =.25
 ASR_1rep_mean_gamma05.py
 - 36ASR_mean_1rep_gamma05_fold#.csv rep 1 mean gamma=.05
 ASR_1rep_std_gamma05.py
@@ -28,6 +18,15 @@ ASR_3rep_mean_gamma05.py
 - 36ASR_mean_3rep_gamma05_fold#.csv rep 3 mean gamma=.05
 ASR_3rep_std_gamma05.py
 - 36ASR_std_3rep_gamma05_fold#.csv rep 3 std gamma=.05
+
+ASR_1rep_mean_gamma10.py
+- 36ASR_mean_1rep_gamma10_fold#.csv rep 1 mean gamma=.10
+ASR_1rep_std_gamma10.py
+- 36ASR_std_1rep_gamma10_fold#.csv rep 1 std gamma=.10
+ASR_3rep_mean_gamma10.py
+- 36ASR_mean_3rep_gamma10_fold#.csv rep 3 mean gamma=.10
+ASR_3rep_std_gamma10.py
+- 36ASR_std_3rep_gamma10_fold#.csv rep 3 std gamma=.10
 
 
 ASR_1rep_mean_gamma15.py
