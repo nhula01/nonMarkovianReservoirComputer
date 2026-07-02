@@ -13,3 +13,4 @@ chi_max = 5
 
 we change omega as [.08, .1,.12,.14, .16]
 we do multiple reps [1,3,5,8,10] 
+

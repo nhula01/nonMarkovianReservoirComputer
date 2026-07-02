@@ -16,6 +16,34 @@ def mackey_glass(Npoints=1000, delay: int = 10,tau: int = 17, x_0: float = 1.0, 
         x_set.append(x_0)
     return x_set[1001 - delay:]
 
+import numpy as np
+
+def narma(Npoints=1000,order=10,delay=10,seed=0,):
+    """
+    Generate a NARMA time series.
+    -------
+    y : ndarray
+        NARMA target sequence.
+    u : ndarray
+        Input sequence used to generate y.
+    """
+    rng = np.random.default_rng(seed)
+    # Random input in [0, 0.5]
+    u = rng.uniform(0.0, 0.5, Npoints + 1000 + order + 1)
+    y = np.zeros_like(u)
+    # Warm-up + generation
+    for t in range(order, len(u)-1):
+        y[t+1] = (
+            0.3 * y[t]
+            + 0.05 * y[t] * np.sum(y[t-order+1:t+1])
+            + 1.5 * u[t-order+1] * u[t]
+            + 0.1)
+    # Remove warm-up
+    start = 1000 + delay
+    end = start + Npoints
+
+    return y[start:end], u[start:end]
+    
 def sine_square_input_task(Nsegments = 110, wsin = 10.0, Nsin = 8, seed= 1234):
     rng = np.random.default_rng(seed)
     # input timing
