@@ -1,4 +1,4 @@
-parameters: 
+Parameters: 
 tau=15
 maxbin=300
 delta_t=1

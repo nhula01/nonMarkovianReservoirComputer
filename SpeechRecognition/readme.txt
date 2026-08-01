@@ -1,11 +1,10 @@
-parameters: 
+Parameters: 
 tau=15
 maxbin=150
 delta_t=1
 gamma = .1
 epsilon = .15
-
-Phi= np.pi/3
+phi= np.pi/3
 theta = np.pi/3
 
 
