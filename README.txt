@@ -62,7 +62,8 @@ project_folder/
 │   ├── Analysis.ipynb
 │   │   This file analyzes the cancer prediction for our Non-Markovian quantum system.
 │   ├── LDA.ipynb
-│   │   This file analyzes the cancer prediction using Linear Discriminant Analysis (LDA). We also extract files input.csv and joblib for training in this     |   |   file. 
+│   │   This file analyzes the cancer prediction using Linear Discriminant Analysis (LDA). We also extract files input.csv and joblib for training in this     
+|   |   file. 
 │   ├── main.ipynb
 │   │   Main code for generating the csv datasets.
 │   └── csv files
@@ -126,7 +127,7 @@ project_folder/
 |       |
 |       └── ESN_model.py, extracter.py, fitting_model.py, tasks.py
 |   ├──diagnostics/
-│   Illustrated Generations for figure S.1, S.2, Main Figure 2, lemma.
+│   Illustrated Generations for figure S.1, S.2, Main Figure 2, lemma. SCRIPT-TO-FIGURE is here.
 │
 └── requirements.txt
 |   List of Python packages needed to run the project.
