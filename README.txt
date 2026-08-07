@@ -126,7 +126,7 @@ project_folder/
 |       |
 |       └── ESN_model.py, extracter.py, fitting_model.py, tasks.py
 |   ├──diagnostics/
-│   Illustrated Generations for figure S.1, S.2, Main Figure 2.
+│   Illustrated Generations for figure S.1, S.2, Main Figure 2, lemma.
 │
 └── requirements.txt
 |   List of Python packages needed to run the project.
