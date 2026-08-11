@@ -24,8 +24,7 @@ project_folder/
 │       how to adjust main.ipynb to reproduce the datasets analyzed in Analysis.ipynb
 │
 ├── StockMarketPrediction/
-│   We analyze the method for stock market application. We predict the performance of one day price ahead for Apple, NASDAQ, SP500 for a period from 2014 to 
-|   2024. The training was done in a roll over fashion. We then observe the performance of SP500 across multiple system parameters.
+│   We analyze the method for stock market application. We predict the performance of one day price ahead for Apple, NASDAQ, SP500 for a period from 2014 to 2024. The training was done in a roll over fashion. We then observe the performance of SP500 across multiple system parameters.
 │   ├── Analysis.ipynb
 │   │   This file analyzes the stock market performance. We then compare to ESN model. 
 │   ├── main.ipynb
@@ -78,12 +77,11 @@ project_folder/
 |   └── readme.txt
 │       how to adjust main.ipynb to reproduce the datasets analyzed in Analysis.ipynb
 |
-├── BenchmarkTasks/
-│   We analyze the method for mackey glass and sine square task. 
+├── Benchmarks/
+│   We analyze the method for mackey glass, sine square, and narma10.
 │   ├── MackeyGlass_NARMA10/
 |       ├── Analysis_SS.ipynb
-|       |   This file compares the performance between ESN and our non-Markovian quantum system. We then proceed to compare the performance of with 
-|       |   and without non-Markovianity.
+|       |   This file compares the performance between ESN and our non-Markovian quantum system. We then proceed to compare the performance of with and without non-Markovianity. The comparison of up to the 9th order is also done here.
 |       ├── main.ipynb
 │       │   Main code for generating the datasets.
 |       ├── ESN_model.py, extracter.py, fitting_model.py, tasks.py, rollover.py, julia files for QED system. 
@@ -128,9 +126,6 @@ project_folder/
 |       └── ESN_model.py, extracter.py, fitting_model.py, tasks.py
 |   ├──diagnostics/
 │   Illustrated Generations for figure S.1, S.2, Main Figure 2, lemma. SCRIPT-TO-FIGURE is here.
-│
-└── requirements.txt
-|   List of Python packages needed to run the project.
 
 
 Requirements
