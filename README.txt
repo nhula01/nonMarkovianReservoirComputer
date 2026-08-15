@@ -1,6 +1,8 @@
 Non-Markovian Reservoir Computing Simulation
 =============
 
+Paper: https://arxiv.org/abs/2608.10382
+
 Description
 -----------
 We model the evolution of a non-Markovian quantum system driven by task dependent input signals. In this project, we evaluate the proposed non-Markovian quantum reservoir across three real-world applications: stock market prediction, speech recognition, and cancer prediction. In addition, we benchmark its performance on standard tasks including the Mackey–Glass and Sine-Square tasks. Finally, we present numerical evidence of universality, which strengthens the practical relevance of our mathematical proof. More simulations are done in the diagnostics.
